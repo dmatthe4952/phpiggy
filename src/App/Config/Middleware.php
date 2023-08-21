@@ -6,6 +6,8 @@ namespace App\Config;
 
 use Framework\App;
 use App\Middleware\{
+    CsrfGuardMiddleware,
+    CsrfTokenMiddleware,
     FlashMiddleware,
     SessionMiddleware,
     TemplateDateMiddleware,
@@ -14,6 +16,8 @@ use App\Middleware\{
 
 function registerMiddleware(App $app)
 {
+    $app->addMiddleware(CsrfGuardMiddleware::class);
+    $app->addMiddleware(CsrfTokenMiddleware::class);
     $app->addMiddleware(TemplateDateMiddleware::class);
     $app->addMiddleware(ValidationExceptionMiddleware::class);
     $app->addMiddleware(FlashMiddleware::class);

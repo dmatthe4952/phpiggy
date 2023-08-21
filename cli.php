@@ -14,23 +14,25 @@ try {
     echo $e->getMessage();
 }
 
+try {
 $db = new Database(
     $_ENV['DB_DRIVER'],
     [
         'host' => $_ENV['DB_HOST'],
-        'port' => 3306,
-        'dbname' => 'phpiggy'
+            'port' => $_ENV['DB_PORT'],
+            'dbname' => $_ENV['DB_NAME']
     ],
-    'phpiggy',
-    'phpuser'
+        $_ENV['DB_USER'],
+        $_ENV['DB_PASS']
 );
+} catch (PDOException $e) {
+    echo "Failed to get DB handle..." . $e->getMessage();
+    exit;
+}
 
 $sqlfile = file_get_contents('./database.sql');
 try {
-    $db->connection->query($sqlfile);
+    $db->query($sqlfile);
 } catch (Exception $e) {
-    if ($db->connection->inTransaction()) {
-        $db->connection->rollBack();
-    }
-    echo "Transaction failed! {$e->getMessage()}";
+    echo "Table createion failed..." . $e->getMessage();
 }
