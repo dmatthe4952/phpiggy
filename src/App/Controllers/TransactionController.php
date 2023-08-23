@@ -31,7 +31,7 @@ class TransactionController
 
     public function editView(array $params)
     {
-        $transaction = $this->transactionService->getUserTrasaction((int) $params['transaction']);
+        $transaction = $this->transactionService->getUserTransaction($params['transaction']);
         echo $this->view->render("transactions/edit.php", [
             'transaction' => $transaction
         ]);

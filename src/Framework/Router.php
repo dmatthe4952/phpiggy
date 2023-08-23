@@ -37,6 +37,10 @@ class Router
         $path = $this->normalizePath($path);
         $method = strtoupper($_POST['_METHOD'] ?? $method);
 
+        if ($path === '/transaction/{transaction}/receipt' && $method === 'POST') {
+            dd($_SERVER);
+        }
+
 
         foreach ($this->routes as $route) {
             if (

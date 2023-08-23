@@ -59,7 +59,7 @@ class TransactionService
         return $count;
     }
 
-    public function getUserTrasaction(int $id): array
+    public function getUserTransaction(string $id): array
     {
         $transaction = $this->db->query(
             "SELECT * FROM transactions WHERE user_id = :user_id AND id = :transaction_id",
