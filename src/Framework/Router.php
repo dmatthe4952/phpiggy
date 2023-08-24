@@ -37,10 +37,6 @@ class Router
         $path = $this->normalizePath($path);
         $method = strtoupper($_POST['_METHOD'] ?? $method);
 
-        if ($path === '/transaction/{transaction}/receipt' && $method === 'POST') {
-            dd($_SERVER);
-        }
-
 
         foreach ($this->routes as $route) {
             if (
@@ -49,6 +45,7 @@ class Router
             ) {
                 continue;
             }
+
 
             array_shift($paramValues);
             preg_match_all('#{([^/]+)}#', $route['path'], $paramKeys);

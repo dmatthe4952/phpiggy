@@ -9,7 +9,6 @@ use App\Middleware\{
     CsrfGuardMiddleware,
     CsrfTokenMiddleware,
     FlashMiddleware,
-    MaxFileSizeMiddleware,
     SessionMiddleware,
     TemplateDateMiddleware,
     ValidationExceptionMiddleware

@@ -6,6 +6,7 @@ namespace App\Services;
 
 use Framework\Database;
 use Framework\Exceptions\ValidationException;
+use App\Config\Paths;
 
 class ReceiptService
 {
@@ -41,11 +42,63 @@ class ReceiptService
         }
     }
 
-    public function upload(array $file)
+    public function upload(array $file, $transaction_id)
     {
         $fileExtension = pathinfo($file['name'], PATHINFO_EXTENSION);
         $newFilename = bin2hex(random_bytes(16)) . "." . $fileExtension;
 
-        dd($newFilename);
+        $uploadPath = Paths::STORAGE_UPLOADS . "/" . $newFilename;
+
+        if (!move_uploaded_file($file['tmp_name'], $uploadPath)) {
+            throw new ValidationException(['receipt' => "Failed to upload file."]);
+        };
+
+        $this->db->query(
+            "INSERT INTO receipts (
+                original_filename,
+                storage_filename,
+                media_type,
+                transaction_id    
+            ) VALUES(
+                :originalFilename,
+                :storageFilename,
+                :mediaType,
+                :transactionId
+            )",
+            [
+                'originalFilename' => $file['name'],
+                'storageFilename' => $newFilename,
+                'mediaType' => $file['type'],
+                'transactionId' => $transaction_id
+            ]
+        );
+    }
+
+    public function getReceipt($receipt_id)
+    {
+
+        $receipt = $this->db->query(
+            "SELECT * FROM receipts
+            WHERE id = :receipt_id ",
+            ['receipt_id' => $receipt_id]
+        )->find();
+
+        return $receipt;
+    }
+
+    public function read(array $receipt)
+    {
+        $filepath = PATHS::STORAGE_UPLOADS . "/" . $receipt['storage_filename'];
+
+        if (!file_exists($filepath)) {
+            redirectTo('/');
+        }
+
+        $doctype = $receipt['media_type'] === 'pdf' ? 'application/pdf' : $receipt['media_type'];
+
+        header("Content-Disposition: inline;filename={$receipt['original_filename']}");
+        header("Content-Type: {$doctype}");
+
+        readfile($filepath);
     }
 }

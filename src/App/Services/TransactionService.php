@@ -31,32 +31,38 @@ class TransactionService
     public function getUserTransactions(int $length, int $offset): array
     {
         $searchTerm = addcslashes($_GET['s'] ?? '', '%_');
+        $params = [
+            'user_id' => $_SESSION['user'],
+            'description' => "%{$searchTerm}%",
+        ];
 
         $transactions = $this->db->query(
-            "Select id, description, amount,
+            "SELECT id, description, amount,
                 DATE_FORMAT(date, '%Y-%m-%d') as 'date',
                 user_id from transactions WHERE user_id = :user_id
                 AND description LIKE :description
                 LIMIT {$length} OFFSET {$offset}",
-            [
-                'user_id' => $_SESSION['user'],
-                'description' => "%{$searchTerm}%",
-            ]
+            $params
         )->findAll();
 
-        return $transactions;
-    }
+        $transactions = array_map(function (array $transaction) {
+            $transaction['receipts'] = $this->db->query(
+                "SELECT * from receipts
+               WHERE transaction_id = :transaction_id",
+                ['transaction_id' => $transaction['id']]
+            )->findAll();
+            return $transaction;
+        }, $transactions);
 
-    public function countTransactions()
-    {
-        $count = $this->db->query(
-            "SELECT COUNT(*) FROM transactions where user_id = :user_id",
-            [
-                'user_id' => $_SESSION['user']
-            ]
+        $transactionsCount = $this->db->query(
+            "SELECT COUNT(*)
+             FROM transactions
+             WHERE user_id = :user_id
+             AND description LIKE :description",
+            $params
         )->count();
 
-        return $count;
+        return [$transactions, $transactionsCount];
     }
 
     public function getUserTransaction(string $id): array
