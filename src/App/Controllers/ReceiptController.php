@@ -67,7 +67,7 @@ class ReceiptController
 
     public function delete(array $params)
     {
-        dd("DELETING");
+
         $transaction = $this->transactionService->getUserTransaction($params['transaction']);
 
         if (empty($transaction)) {
@@ -84,9 +84,8 @@ class ReceiptController
             redirectTo('/');
         }
 
-        $this->receiptService->read($receipt);
+        $this->receiptService->delete($receipt);
 
-
-        echo "deleteing receipt #{$params['receipt']}";
+        redirectTo('/');
     }
 }

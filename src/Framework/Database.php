@@ -61,5 +61,10 @@ class Database
         return $this->stmt->fetchAll();
     }
 
+    public function execute()
+    {
+        return $this->stmt->execute();
+    }
+
 
 }
