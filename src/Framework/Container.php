@@ -14,7 +14,7 @@ class Container
 
     public function addDefinitions(array $newDefinitions)
     {
-        $this->definitions = [...$this->definitions, ...$newDefinitions];
+        $this->definitions = $newDefinitions;
     }
 
     public function resolve(string $className)
